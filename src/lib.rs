@@ -1,12 +1,14 @@
 use error_chain::ChainedError;
 use serde_json::Value;
-use serde;
+use serde::{self, __private::de::UntaggedUnitVisitor};
 use url::Url;
 use ureq;
 use log::debug;
 use std::{fs::File, io::Read};
 use std::io::Write;
+use std::io::BufReader;
 use std::io::BufWriter;
+use std::path::Path;
 use unzip;
 #[macro_use]
 extern crate error_chain;
@@ -63,6 +65,12 @@ impl Ngrok {
                     writer.write(&buf[..n]).unwrap();
                 }
                 writer.flush().unwrap();
+                let zip = File::open("ngrok-win64.zip").unwrap();
+                let mut reader = BufReader::new(zip);
+                let path = Path::new(".");
+                let unz = unzip::Unzipper::new(reader, &path);
+                let stats = unz.unzip().unwrap();
+                //println!("stats: {}", stats);
             }
             Err(_) => {}
         }
