@@ -4,7 +4,10 @@ use serde;
 use url::Url;
 use ureq;
 use log::debug;
-
+use std::{fs::File, io::Read};
+use std::io::Write;
+use std::io::BufWriter;
+use unzip;
 #[macro_use]
 extern crate error_chain;
 error_chain! {
@@ -13,6 +16,7 @@ error_chain! {
 }
 
 static BASE_URL_STR: &str  = "http://127.0.0.1:4040";
+static NGROK_WIN64: &str = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip";
 
 #[derive(Debug)]
 pub struct Ngrok {
@@ -37,6 +41,7 @@ impl Ngrok {
                     }
                     Err(err) => {
                         debug!("CALL ERR: {:#?}", err);
+                        self.download();
                         Err(Error::from("hammp"))
                     }
                 }
@@ -44,6 +49,24 @@ impl Ngrok {
             Err(err) => Err(err)
         }
     } 
+    pub fn download(&self) {
+        match ureq::get(NGROK_WIN64).call() {
+            Ok(resp) => {
+                let mut reader = resp.into_reader();
+                let mut buf=[0u8;1024];
+                let zip = File::create("ngrok-win64.zip").unwrap();
+                let mut writer = BufWriter::new(zip);
+                while let Ok(n) = reader.read(&mut buf) {
+                    if n == 0 {
+                        break
+                    }
+                    writer.write(&buf[..n]).unwrap();
+                }
+                writer.flush().unwrap();
+            }
+            Err(_) => {}
+        }
+    }
 }
 
 
