@@ -13,7 +13,7 @@ error-chain = "0.12.4"
 log = "*"
 env_logger = "*"
 url = "*"
-serde = "*"
+serde =  { version = "*", features = ["derive"] }
 serde_json = "*"
 lazy_static = "*"
 unzip = "*"
