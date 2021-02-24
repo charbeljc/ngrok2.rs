@@ -1,7 +1,7 @@
 use serde_json::Value;
 use url::Url;
-use log::{debug, error, info, trace, warn};
-use std::{fs, io::prelude::*, str, thread::JoinHandle};
+use log::{debug, error, info};
+use std::{fs, io::prelude::*, str};
 use std::io::BufReader;
 use std::{fs::File, io::Read};
 use std::io::BufWriter;
@@ -174,7 +174,7 @@ impl Ngrok {
         let res = match path {
             Some(path) => {
                 info!("launching ngrok: {}", path.to_string_lossy());
-                let mut proc = process::Command::new(path)
+                let proc = process::Command::new(path)
                     .args(&["start", "--none"])
                     .spawn()
                     .expect("ngrok failed to start");
@@ -397,7 +397,7 @@ impl Ngrok {
 
 #[cfg(test)]
 mod tests {
-    use crate::{debug, info, warn, error};
+    use log::{debug, info, warn, error};
     use serde::__private::ser;
     use crate::{Ngrok, Tunnel, Tunnels, find_file_in_path}; 
     use serde_json::{Value, json};
